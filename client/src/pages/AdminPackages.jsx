@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { API, getAdminHeaders } from "../api";
-import { SectionHeader, PackageCard, InfoCard } from "../components/uiCommon";
+import { SectionHeader, PackageCard, InfoCard } from "../components/UICommon";
 import { 
   Package, 
   Plus, 
