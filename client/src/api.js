@@ -1,70 +1,58 @@
-
-//client/src/api.js
+// client/src/api.js
 import axios from "axios";
 
-// Try different ports in case one is busy
-const PORTS_TO_TRY = [5000, 5001, 5002, 5003, 5004];
-let currentBaseURL = "";
+/*
+  This file works in BOTH:
+  - Local development
+  - Production (Vercel + Render)
 
-// Function to test backend connection
-const testBackendConnection = async (port) => {
-  try {
-    const testURL = `http://localhost:${port}/api/test`;
-    const response = await axios.get(testURL, { timeout: 2000 });
-    return response.data.success ? port : null;
-  } catch (error) {
-    return null;
-  }
-};
+  Local  : uses http://localhost:5000/api
+  Live   : uses VITE_API_URL from environment variables
+*/
 
-// Find working backend port
-const findWorkingBackend = async () => {
-  console.log("🔍 Looking for backend server...");
-  
-  for (const port of PORTS_TO_TRY) {
-    console.log(`Trying port ${port}...`);
-    const result = await testBackendConnection(port);
-    if (result) {
-      console.log(`✅ Found backend on port ${port}`);
-      return `http://localhost:${port}/api`;
-    }
-  }
-  
-  console.warn("⚠️ Backend not found on any port. Using default port 5000");
-  return "http://localhost:5000/api";
-};
+// ============================================
+// BASE URL
+// ============================================
 
-// Create API instance
+const BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+console.log("🌍 API Base URL:", BASE_URL);
+
+// ============================================
+// AXIOS INSTANCE
+// ============================================
+
 const API = axios.create({
-  baseURL: "", // Will be set dynamically
+  baseURL: BASE_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Initialize baseURL
-findWorkingBackend().then(url => {
-  currentBaseURL = url;
-  API.defaults.baseURL = url;
-  console.log(`✅ API baseURL set to: ${url}`);
-}).catch(err => {
-  console.error("❌ Failed to find backend:", err);
-  // Fallback to default
-  API.defaults.baseURL = "http://localhost:5000/api";
-});
+// ============================================
+// REQUEST INTERCEPTOR
+// ============================================
 
-// Add interceptors for debugging
 API.interceptors.request.use(
   (config) => {
-    // Use current baseURL if not set
-    if (!config.baseURL && currentBaseURL) {
-      config.baseURL = currentBaseURL;
+    const token =
+      localStorage.getItem("adminToken") ||
+      localStorage.getItem("userToken");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log(`📤 ${config.method.toUpperCase()} ${config.baseURL}${config.url}`);
+
+    console.log(
+      `📤 ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`
+    );
+
     if (config.data) {
-      console.log("Request data:", config.data);
+      console.log("📦 Data:", config.data);
     }
+
     return config;
   },
   (error) => {
@@ -73,25 +61,31 @@ API.interceptors.request.use(
   }
 );
 
+// ============================================
+// RESPONSE INTERCEPTOR
+// ============================================
+
 API.interceptors.response.use(
   (response) => {
-    console.log(`✅ ${response.status} ${response.config.method.toUpperCase()} ${response.config.url}`);
+    console.log(
+      `✅ ${response.status} ${response.config.method?.toUpperCase()} ${response.config.url}`
+    );
     return response;
   },
   (error) => {
-    console.error("❌ Response error:");
     if (error.response) {
-      console.error("Status:", error.response.status);
-      console.error("Data:", error.response.data);
-    } else if (error.request) {
-      console.error("No response received. Is backend running?");
-      console.error("Tried URL:", error.config?.baseURL + error.config?.url);
+      console.error("❌ API Error:", error.response.status);
+      console.error("Message:", error.response.data?.message);
     } else {
-      console.error("Request setup error:", error.message);
+      console.error("❌ Network error: Backend not reachable");
     }
     return Promise.reject(error);
   }
 );
+
+// ============================================
+// OPTIONAL ADMIN HEADERS
+// ============================================
 
 export const getAdminHeaders = () => {
   const token = localStorage.getItem("adminToken");
@@ -103,4 +97,4 @@ export const getAdminHeaders = () => {
   };
 };
 
-export { API };
+export default API;

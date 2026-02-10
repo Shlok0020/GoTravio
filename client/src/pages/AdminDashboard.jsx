@@ -84,7 +84,6 @@ const AdminDashboard = () => {
   });
   const [quickStats, setQuickStats] = useState({
     conversionRate: 0,
-    avgResponseTime: "2h 15m",
     topService: "Cab Booking",
     peakHour: "10:00 AM"
   });
