@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* custom component styles */
+@layer components {
+  .ticket-card {
+    @apply relative bg-white border border-slate-200 rounded-2xl p-6 shadow-sm;
+  }
+
+  .ticket-card::before,
+  .ticket-card::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    background: #f8fafc;
+    border-radius: 9999px;
+    transform: translateY(-50%);
+  }
+
+  .ticket-card::before {
+    left: -8px;
+    border-right: 1px dashed #cbd5e1;
+  }
+
+  .ticket-card::after {
+    right: -8px;
+    border-left: 1px dashed #cbd5e1;
+  }
+
+  .section {
+    @apply max-w-6xl mx-auto px-4 py-16;
+  }
+
+  .section-title {
+    @apply text-3xl font-bold text-slate-900 mb-4;
+  }
+
+  .section-subtitle {
+    @apply text-slate-600 max-w-2xl;
+  }
+
+  .cta-btn {
+    @apply inline-block mt-6 px-6 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition;
+  }
+}
