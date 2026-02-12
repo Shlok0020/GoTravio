@@ -93,18 +93,29 @@ ${details ? `• Details:\n${details}` : ''}
       `
     };
 
-    console.log('\n🚀 Sending email...');
-    console.log('Subject:', mailOptions.subject);
-    
-    const info = await transporter.sendMail(mailOptions);
-    
-    console.log('\n🎉 EMAIL SENT SUCCESSFULLY!');
-    console.log('📧 Message ID:', info.messageId);
-    console.log('✅ Response:', info.response ? info.response.split('\n')[0] : 'Sent');
-    console.log('📬 Delivered to:', adminEmail);
-    console.log('⏰ Time:', new Date().toLocaleTimeString());
-    
-    return true;
+ console.log('\n🚀 Sending email via Brevo API...');
+console.log('Subject:', mailOptions.subject);
+
+await apiInstance.sendTransacEmail({
+  subject: mailOptions.subject,
+
+  sender: {
+    name: "GoTravio",
+    email: process.env.SMTP_USER // reuse your existing sender
+  },
+
+  to: adminEmail.split(',').map(email => ({ email: email.trim() })),
+
+  htmlContent: mailOptions.html,
+  textContent: mailOptions.text
+});
+
+console.log('\n🎉 EMAIL SENT SUCCESSFULLY (BREVO API)!');
+console.log('📬 Delivered to:', adminEmail);
+console.log('⏰ Time:', new Date().toLocaleTimeString());
+
+return true;
+
     
   } catch (error) {
     console.error('\n❌ EMAIL SEND FAILED!');

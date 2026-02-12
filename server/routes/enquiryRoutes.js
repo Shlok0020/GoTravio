@@ -77,19 +77,17 @@ router.post("/", async (req, res) => {
     console.log("📊 Enquiry ID:", savedEnquiry._id);
     console.log("📊 Created at:", savedEnquiry.createdAt);
 
-    // Send email notification ASYNC (don't wait for it)
-    console.log("📧 Triggering email notification...");
-    sendEnquiryNotification(savedEnquiry)
-      .then(success => {
-        if (success) {
-          console.log("✅ Email notification sent successfully");
-        } else {
-          console.log("⚠️ Email notification failed (check logs above)");
-        }
-      })
-      .catch(err => {
-        console.error("⚠️ Email promise error:", err.message);
-      });
+          // Send email notification (WAIT for it in production)
+      console.log("📧 Sending email notification...");
+
+      const emailSent = await sendEnquiryNotification(savedEnquiry);
+
+      if (emailSent) {
+        console.log("✅ Email notification sent successfully");
+      } else {
+        console.log("⚠️ Email notification failed");
+      }
+
 
     // Send immediate response to client
     res.status(201).json({
