@@ -1,4 +1,5 @@
-import transporter from '../config/mail.js';
+import apiInstance from '../config/brevo.js';
+
 
 
 /**
