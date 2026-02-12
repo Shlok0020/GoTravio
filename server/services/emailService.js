@@ -1,4 +1,5 @@
-import getTransporter from '../config/mail.js';
+import transporter from '../config/mail.js';
+
 
 /**
  * Send enquiry notification email using saved enquiry data from MongoDB
@@ -27,9 +28,6 @@ export const sendEnquiryNotification = async (enquiryData) => {
     console.log('- Details:', details || 'Not provided');
     console.log('- Submitted:', new Date(createdAt).toLocaleString());
 
-    // Get transporter
-    const transporter = getTransporter();
-    
     // Format date
     const enquiryDate = new Date(createdAt).toLocaleString('en-IN', {
       day: '2-digit',

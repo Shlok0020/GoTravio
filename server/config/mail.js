@@ -77,5 +77,7 @@ const getTransporter = () => {
   }
 };
 
-// Export as default
-export default getTransporter;
+// Create ONE shared transporter instance
+const transporter = getTransporter();
+
+export default transporter;
